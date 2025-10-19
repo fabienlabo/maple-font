@@ -1,5 +1,5 @@
 import source.py.feature.ast as ast
-from source.py.feature.cv.const import GLYPHS_I
+from source.py.feature.cv._common import GLYPHS_I
 
 
 def cv33_subst():
@@ -11,12 +11,14 @@ def cv33_subst():
             result.append(ast.gly("ill", suf))
 
         return result
+
     return ast.subst_map(
         [
             *GLYPHS_I,
             "j",
             "jcircumflex",
             "jdotless",
+            "je-cy",
             *gen("", ".cv04"),
         ],
         target_suffix=".cv33",

@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://trendshift.io/repositories/13165" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13165" alt="subframe7536%2Fmaple-font | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  <a href="https://hellogithub.com/repository/0601f355bd824d88b58f1af3066c486a" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0601f355bd824d88b58f1af3066c486a&claim_uid=AO0yWRQ48ITGNqK" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 </p>
 <p align="center">
   <img alt="GitHub Repo Stars" src="https://img.shields.io/github/stars/subframe7536/maple-font">
@@ -481,9 +482,6 @@ fonts.packages = with pkgs; [
 
 [ドキュメント](./source/features/README.md)を参照するか、[プレイグラウンド](https://font.subf.dev/en/playground)で試してください。
 
-> [!note]
-> カスタムビルド用の Web ツールは開発中です。
-
 ## 命名に関する FAQ
 
 ### 特徴
@@ -512,12 +510,15 @@ fonts.packages = with pkgs; [
 - なぜ `-AutoHint` と `-unhinted` サフィックスが存在するのですか？
   - 後方互換性のために、元の命名スキームを保持しています。`-AutoHint` は `TTF` 形式にのみ使用されます。
 
-
 ## カスタムビルド
 
 [`config.json`](./config.json)ファイルはビルドプロセスを構成するために使用されます。詳細については、[スキーマ](./source/schema.json)または[ドキュメント](./source/features/README.md)を参照してください。
 
 ビルドプロセスをカスタマイズするための[コマンドラインオプション](#build-script-usage)もいくつかあります。CLI オプションは `config.json` のオプションよりも優先されます。
+
+### ブラウザで構築する
+
+[プレイグラウンド](https://font.subf.dev/en/playground)に行く，左下隅の「Custom Build」ボタンをクリックしてください
 
 ### Github Actions を使用する
 
@@ -539,7 +540,6 @@ docker build -t maple-font .
 docker run -v "$(pwd)/fonts:/app/fonts" -e BUILD_ARGS="--normal" maple-font
 ```
 
-
 ### ローカルビルド
 
 リポジトリをクローンし、ローカルマシンで実行します。`python3` と `pip` がインストールされていることを確認してください。
@@ -550,18 +550,24 @@ pip install -r requirements.txt
 python build.py
 ```
 
-- `Ubuntu` または `Debian` の場合、`python-is-python3` も必要な場合があります。
-
-依存関係のインストールに問題がある場合は、新しい GitHub Codespace を作成し、そこでコマンドを実行してください。
+> [!TIP]
+> `Ubuntu` または `Debian` の場合、`python-is-python3` も必要な場合があります。
+>
+> 依存関係のインストールに問題がある場合は、新しい GitHub Codespace を作成し、そこでコマンドを実行してください。
 
 #### カスタム Nerd-Font
 
-カスタム `font-patcher` 引数の場合、`font-forge`（おそらく `python3-fontforge` も）が必要です。
+固定幅のアイコンを取得したいだけの場合は、`config.json` に `"nerd_font.mono": true` を設定するか、ビルドスクリプト引数に `--nf-mono` フラグを追加してください。
 
-おそらく[config.json](./config.json)の `"nerd_font.extra_args"` も変更する必要があります。
+可変幅のアイコンを取得したいだけの場合は、`config.json` に `"nerd_font.propo": true` を設定するか、ビルドスクリプト引数に `--nf-propo` フラグを追加してください。
 
-デフォルトの引数：`-l --careful --outputdir dir`
-- `"nerd_font.mono"` が `true` の場合、`--mono` が追加されます。
+カスタム `font-patcher` 引数には、`font-forge`（おそらく `python3-fontforge` も必要です）が必要です。
+
+[config.json](./config.json) で `"nerd_font.extra_args"` を変更する必要があるかもしれません。
+
+デフォルト引数： `-l --careful --outputdir dir`
+- `"nerd_font.propo"` が `true` の場合は `--variable-width-glyphs` を追加
+- そうでなければ、`"nerd_font.mono"` が `true` の場合は `--mono` を追加
 
 #### プリセット
 
@@ -575,6 +581,8 @@ python build.py
 cv01, cv02, cv33, cv34, cv35, cv36, cv61, cv62, ss05, ss06, ss07, ss08
 ```
 <!-- NORMAL -->
+
+[オンラインプレビュー](https://font.subf.dev/en/playground?normal)
 
 #### フォント機能のフリーズ
 
@@ -590,17 +598,46 @@ OpenType Feature は、フォントに組み込まれたバリエーションや
 
 デフォルトでは、[`source/py/feature/`](./source/py/feature) 内の Python モジュールが OpenType Feature 文字列を生成し、ビルド時にロードします。ここで機能を変更したりカスタムタグを設定することができます。
 
-OpenType Feature ファイルを直接編集して実現したい場合、`build.py`  を実行する際に `--apply-fea-file` 引数を追加すると、[`source/features/{regular,italic}.fea`](./source/features) の特性ファイルが読み込まれ、適用されます。
+OpenType Feature ファイルを直接編集して実現したい場合、`build.py`  を実行する際に `--apply-fea-file` 引数を追加すると、[`source/features/{regular,italic}{_cn,}.fea`](./source/features) の特性ファイルが読み込まれ、適用されます。
+
+#### 無限矢印リガチャ
+
+Fira Codeに着想を得て、このフォントはv7.3からデフォルトで無限の矢印リガチャを有効にします。何らかの理由で、hintedフォントを使用するとリガチャがずれてしまうため、v7.4のhintedバージョンではデフォルトでそれを削除しました。
+
+`config.json` に `"infinite_arrow": true` を設定するか、CLI フラグに `--infinite-arrow` を追加してください。詳細は [#508](https://github.com/subframe7536/maple-font/issues/508) を参照してください
+
+#### カスタムフォントウェイトマッピング
+
+`config.json` の `"weight_mapping"` 項目を通じて、静的なフォントのウェイトを変更できます。
+
+たとえば、通常のフォントウェイトを少し軽くしたい場合は、`"weight_mapping.regular"` の数値を下げるだけです（この例では 400 から 350 に変更）：
+
+```json
+{
+  "weight_mapping": {
+    "thin": 100,
+    "extralight": 200,
+    "light": 300,
+    "regular": 350,
+    "semibold": 500,
+    "medium": 600,
+    "bold": 700,
+    "extrabold": 800
+  }
+}
+```
 
 ### 中国語バージョン
 
-CN バージョンはデフォルトで無効になっています。`python build.py` を `--cn` フラグで実行すると、CN ベースフォント（約 130 MB）が GitHub からダウンロードされます。
+CN バージョンはデフォルトで無効になっています。`python build.py` を `--cn` フラグで実行すると、CN ベースフォント（約 111 MB）が GitHub からダウンロードされます。
 
-可変（約 35 MB）から CN ベースフォントをビルドしたい場合は、[config.json](./config.json)で `"cn.use_static_base_font": false` を設定し、**忍耐強く待ってください**。インスタンス化には約 20〜30 分かかります。
+可変（約 27 MB）から CN ベースフォントをビルドしたい場合は、[config.json](./config.json)で `"cn.use_static_base_font": false` を設定し、**忍耐強く待ってください**。インスタンス化には約 20〜30 分かかります。
 
 #### CN グリフの間隔を狭くする
 
-CN グリフの間隔が**非常に大きい**と感じる場合、間隔を狭くする**実験的**なビルドオプション `cn.narrow` またはフラグ `--cn-narrow` があります。効果を確認し、[#249](https://github.com/subframe7536/maple-font/issues/249)で問題を追跡できます。
+もし中国語グリフ（字形）の文字間隔が広すぎるように感じられる 場合は、`cn.narrow` というビルドオプションまたは、コマンドラインオプションの `--cn-narrow` を使用することで、中国語グリフの文字間隔を狭くすることが可能です。ただし、この設定を有効にすると、フォントが等幅フォントとして認識されなくなる可能性があります。
+
+効果については、[#249](https://github.com/subframe7536/maple-font/issues/249#issuecomment-2871260476) をご参照ください。
 
 #### 繁体中文の句読点サポート
 
@@ -614,43 +651,60 @@ CN グリフの間隔が**非常に大きい**と感じる場合、間隔を狭�
 
 ```
 usage: build.py [-h] [-v] [-d] [--debug] [-n] [--feat FEAT] [--apply-fea-file]
-                [--hinted | --no-hinted] [--liga | --no-liga] [--cn-narrow]
-                [--nerd-font | --no-nerd-font] [--cn | --no-cn] [--cn-both]
-                [--ttf-only] [--least-styles] [--cache] [--cn-rebuild]
-                [--archive]
+                [--hinted | --no-hinted] [--liga | --no-liga] [--keep-infinite-arrow]
+                [--infinite-arrow] [--remove-tag-liga] [--line-height LINE_HEIGHT]
+                [--nf-mono] [--nf-propo] [--cn-narrow]
+                [--cn-scale-factor CN_SCALE_FACTOR] [--nf | --no-nf] [--cn | --no-cn]
+                [--cn-both] [--ttf-only] [--least-styles] [--font-patcher] [--cache]
+                [--cn-rebuild] [--archive]
 
 ✨ Builder and optimizer for Maple Mono
 
 options:
-  -h, --help        このヘルプメッセージを表示して終了
-  -v, --version     プログラムのバージョン番号を表示して終了
-  -d, --dry         設定を出力して終了
-  --debug           ファミリ名に `Debug` サフィックスを追加し、ビルドを高速化します
+  -h, --help            このヘルプメッセージを表示して終了
+  -v, --version         プログラムのバージョン番号を表示して終了
+  -d, --dry             設定を出力して終了
+  --debug               ファミリ名に `Debug` サフィックスを追加し、ビルドを高速化
 
 Feature Options:
-  -n, --normal      `JetBrains Mono` のように斜線付きゼロを持つ通常のプリセットを使用
-  --feat FEAT       フォント機能をフリーズし、`,` で区切る（例： `--feat zero,cv01,ss07,ss08` ）。
-                    可変フォーマットには効果がありません
-  --apply-fea-file  `source/features/{regular,italic}.fea` から機能ファイルを読み込み、可変フォントに適用
-  --hinted          NF / CN / NF-CNでヒント付きフォントをベースフォントとして使用（デフォルト）
-  --no-hinted       NF / CN / NF-CNでヒントなしフォントをベースフォントとして使用
-  --liga            すべてのリガチャを保持（デフォルト）
-  --no-liga         すべてのリガチャを削除
-  --cn-narrow       CN文字を狭くする（実験的）
+  -n, --normal          `JetBrains Mono` のように斜線付きゼロを持つ通常のプリセットを使用
+  --feat FEAT           フォント機能をフリーズし、`,` で区切る（例： `--feat
+                        zero,cv01,ss07,ss08`）。可変フォーマットには効果がありません
+  --apply-fea-file      `source/features/{regular,italic}.fea` から機能ファイルを読み込み、
+                        可変フォントに適用
+  --hinted              NF / CN / NF-CNでヒント付きフォントをベースフォントとして使用
+                        （デフォルト）
+  --no-hinted           NF / CN / NF-CNでヒントなしフォントをベースフォントとして使用
+  --liga                すべてのリガチャを保持（デフォルト）
+  --no-liga             すべてのリガチャを削除
+  --infinite-arrow      無限アローリガチャを有効にする（hinted フォントではデフォルト
+                        で無効）
+  --remove-tag-liga     純テキストタグのリガチャ、例えば `[TODO]` を削除する。
+  --line-height LINE_HEIGHT
+                        行の高さのスケールファクター（例：1.1）
+  --nf-mono             Nerd Font アイコンの幅を固定します
+  --nf-propo            Nerd Font アイコンの幅を可変にし、--nf-mono を上書きします
+  --cn-narrow           中国語/日本語の文字間隔を縮小する（同時にシステムが等幅フォントと
+                        して認識できなくなる）
+  --cn-scale-factor CN_SCALE_FACTOR
+                        中国語/日本語グリフのスケール係数。形式：<係数> または
+                        <幅の係数>,<高さの係数> (例：1.1 または 1.2,1.1)
 
 Build Options:
-  --nerd-font       Nerd-Fontバージョンをビルド（デフォルト）
-  --no-nerd-font    Nerd-Fontバージョンをビルドしない
-  --cn              中国語バージョンをビルド
-  --no-cn           中国語バージョンをビルドしない（デフォルト）
-  --cn-both         `Maple Mono CN` と `Maple Mono NF CN` の両方をビルド。
-                    Nerd-Fontバージョンが有効である必要があります
-  --ttf-only        TTF形式のみをビルド
-  --least-styles    通常の / 太字 / 斜体 / 太字斜体スタイルのみを構築する
-  --cache           TTF、OTF、Woff2形式のフォントキャッシュを再利用
-  --cn-rebuild      CNベースフォントを再インスタンス化
-  --archive         設定とライセンスを含むフォントアーカイブをビルド。
-                    `--cache` フラグがある場合、Nerd-FontとCN形式のみをアーカイブ
+  --nf, --nerd-font     Nerd-Fontバージョンをビルド（デフォルト）
+  --no-nf, --no-nerd-font
+                        Nerd-Fontバージョンをビルドしない
+  --cn                  中国語バージョンをビルド
+  --no-cn               中国語バージョンをビルドしない（デフォルト）
+  --cn-both             `Maple Mono CN` と `Maple Mono NF CN` の両方をビルド。
+                        Nerd-Fontバージョンが有効である必要があります
+  --ttf-only            TTF形式のみをビルド
+  --least-styles        通常の / 太字 / 斜体 / 太字斜体スタイルのみを構築する
+  --font-patcher        NF形式を構築するためにNerd Font Patcherの使用を強制する
+  --cache               TTF、OTF、Woff2形式のフォントキャッシュを再利用
+  --cn-rebuild          CNベースフォントを再インスタンス化
+  --archive             設定とライセンスを含むフォントアーカイブをビルド。
+                        `--cache` フラグがある場合、NFとCN形式のみをアーカイブ
 ```
 
 ## クレジット

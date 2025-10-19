@@ -1,15 +1,18 @@
-# MapleFont Feature Module
+# Maple Mono Feature Module
 
-This module provides utilities for defining and managing OpenType font features. It includes tools for creating stylistic sets, character variants, ligatures, and more.
+A utility module for managing OpenType font features like stylistic sets, character variants, and ligatures.
+
+## Why
+
+Most open-source font projects manage OpenType feature files manually. While fonttools' `ast` module enables feature file automation, the lack of documentation made implementation challenging. This module reimplements the `ast` functionality to generate `.fea` files and integrate them during builds.
 
 ## Overview
 
-The `feature/` module is designed to simplify the creation of OpenType font features. It uses an abstract syntax tree (AST) approach to define and manage features programmatically.
+The `feature/` module uses an AST approach to programmatically define OpenType features.
 
 ### Key Components
 
 - **`ast.py`**: Core utilities for defining OpenType features.
-- **`common.py`**: Shared feature and feature file generation logic.
 - **`regular.py`**: Entry file for regular features.
 - **`italic.py`**: Entry file for italic features.
 - **`base/`**: Foundational classes and features (e.g., numbers, cases, localized forms).
@@ -21,9 +24,9 @@ The `feature/` module is designed to simplify the creation of OpenType font feat
 
 ### Custom Tags
 
-The `calt/tag.py` file provides utilities for creating custom tags.
+Create custom tags using utilities in `calt/tag.py`.
 
-There are many built-in tags with full-round border in the font, you can use `subst_liga` function to custom trigger text. Following example shows how to convert `TODO:` to `(TODO)` (Cons: the first letter before the tag will be overlapped)
+The font includes built-in tags with full-round borders. Use `subst_liga` to customize trigger text:
 
 ```py
 subst_liga(
@@ -33,7 +36,7 @@ subst_liga(
 )
 ```
 
-If you want to get more tags, use `tag_custom` function:
+For additional tags, use `tag_custom`:
 
 ```py
 tag_custom(
@@ -56,28 +59,29 @@ into a styled tag:
 
 #### Limitations
 
-1. Built-in tags are optimized for spacing; custom tags are not.
-2. Tags may split if letter spacing > 0. See [#381](https://github.com/subframe7536/maple-font/issues/381#issuecomment-2808022878).
-3. Tags inherit the original text color. See [#381](https://github.com/subframe7536/maple-font/issues/381#issuecomment-2809622541).
+1. Custom tags lack spacing optimization.
+2. Tags may break with letter spacing > 0. See [#381](https://github.com/subframe7536/maple-font/issues/381#issuecomment-2808022878).
+3. Tags inherit text color. See [#381](https://github.com/subframe7536/maple-font/issues/381#issuecomment-2809622541).
 
-## Freeze Feature in Variable Format
+### Remove Infinite Ligatures
 
-There are two strategies to freeze a feature:
+To disable infinite ligatures for `=`, `-`, `~`, and `#`, set `__USE_INFINITE = False` in `calt/_infinite_utils.py`.
 
-1. For lookups implementing new ligatures (e.g., `ss08`), move rules into `calt`.
-2. For glyph replacements (e.g., `cv01`), substitute glyphs directly with their originals.
+## Variable Font Features
 
-Currently, the second approach cannot be implemented in variable format, so in the V7.0 release all variable format variants are identical except for the family name. The build script provides an escape hatch with the `--apply-fea-file` flag.
+Two strategies exist for feature freezing:
+1. Move ligature rules to `calt` (e.g., `ss08`)
+2. Direct glyph substitution (e.g., `cv01`)
 
-Since the feature-loading logic was refactored to Python, features are loaded dynamically. The logic in [`common.py`](./common.py) moves rules from the target feature to `calt` (method 1). Enabling the `calt` feature will yield styling equivalent to the static version.
+Currently, method 2 isn't supported in variable format. In V7.0, all variable format variants are identical except for family name. Use `--apply-fea-file` flag as needed.
 
-So, please **ENABLE FONT LIGATURE** to make all features work if you are using variable font (NOT recommended).
+Features now load dynamically via Python. The logic in `common.py` implements method 1. **Enable font ligatures** to use all features in variable fonts (not recommended).
 
-### AST Utilities
+## AST Utilities
 
-The `ast.py` file provides classes and functions to define OpenType features. Below are some key utilities:
+Core utilities for defining OpenType features:
 
-#### `Clazz`
+### `Clazz`
 
 Represents a class of glyphs.
 
@@ -96,7 +100,7 @@ Generated fea string:
 sub @Digit a' b by c;
 ```
 
-#### `Lookup`
+### `Lookup`
 
 Defines a lookup block for substitutions.
 
@@ -121,7 +125,7 @@ lookup example_lookup {
 } example_lookup;
 ```
 
-#### `Feature`
+### `Feature`
 
 Represents an OpenType feature.
 
@@ -149,7 +153,7 @@ feature calt {
 }
 ```
 
-#### Create
+### Create
 
 Generates the final OpenType feature file content.
 
@@ -160,17 +164,15 @@ fea_content = create([feature_example])
 print(fea_content)
 ```
 
-### Generating Features
+## Generating Features
 
-In most of time, you don't need to update the fea files. The generated fea string will be automatically applied at build time without using `--apply-fea-file` flag.
-
-To update existing fea files, you can run:
+Features apply automatically during build. To update fea files manually:
 
 ```sh
 uv run task.py fea
 ```
 
-Here is an example to show how to use the `generate_fea_string` function to generate feature files
+Example feature generation:
 
 ```py
 from source.py.feature import generate_fea_string
